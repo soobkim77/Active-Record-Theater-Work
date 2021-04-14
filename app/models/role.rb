@@ -2,26 +2,27 @@ class Role < ActiveRecord::Base
 
     has_many :auditions
 
-    def self.auditions
-        Audition.where(role_id: self.id)
+
+    def actors
+        self.auditions.pluck(:actor)
     end
 
-    def self.actors
-        Audition.where(role_id: self.id).pluck(:actor)
+    def location
+        self.auditions.pluck(:location)
     end
 
-    def self.location
-        Audition.where(role_id: self.id).pluck(:location)
+    def lead
+        if self.auditions.find_by(hired: true)
+            self.auditions.find_by(hired: true)
+        else
+            puts "no actor has been hired for this role"
+        end
     end
 
-    def self.lead
-       unless Audition.find_by(role_id: self.id, hired: true)
-        puts "no actor has been hired for this role"
-       end
-    end
-
-    def self.understudy
-        unless Audition.where(role_id: self.id).second
+    def understudy
+        if self.auditions.where(hired: true).second
+            self.auditions.where(hired: true).second
+        else
             puts "no actor has been hired for understudy for this role"
         end
     end
